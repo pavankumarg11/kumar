@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+xmlns:aop="http://www.springframework.org/schema/aop" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:p="http://www.springframework.org/schema/p"
+xmlns:context="http://www.springframework.org/schema/context" 
+xmlns:oxm="http://www.springframework.org/schema/oxm" 
+xmlns:mvc="http://www.springframework.org/schema/mvc"
+xmlns:task="http://www.springframework.org/schema/task"   
+       xmlns:util="http://www.springframework.org/schema/util"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
+				http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+				http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.2.xsd
+				http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd 
+				http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+				http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+				">
+
+    <context:spring-configured/>
+
+	<context:component-scan base-package="com.bricks" />
+	<util:properties id="propertyConfigurer" 
+                  location="classpath:/com/bricks/resources/bricks.properties"/>
+<context:property-placeholder properties-ref="propertyConfigurer" />
+	
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+	<mvc:annotation-driven />
+	<task:annotation-driven />
+	<!-- <mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/showIndex" />
+			<mvc:mapping path="/**"/>
+			<mvc:exclude-mapping path="/showLogin"/>
+			<mvc:exclude-mapping path="/login"/>
+			<mvc:exclude-mapping path="/socialLogin"/>
+			<mvc:exclude-mapping path="/showVendorRegistration"/>
+			<mvc:exclude-mapping path="/saveRegisterdVendor"/>
+			<mvc:exclude-mapping path="/showForgotPassword"/>
+			<mvc:exclude-mapping path="/forgotPassword"/>
+			<mvc:exclude-mapping path="/requestResetPassword"/>
+			<mvc:exclude-mapping path="/emailResetLink"/>
+			<mvc:exclude-mapping path="/showResetPassword"/>
+			<mvc:exclude-mapping path="/resetPassword"/>  
+			<mvc:exclude-mapping path="/showVendorPage"/>
+			<mvc:exclude-mapping path="/showPreview1"/>
+			<mvc:exclude-mapping path="/showIndex"/>
+			<bean class="com.zambient.maf.interceptor.MafInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors> -->
+	
+	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+	
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="order" value="1" />
+	    <property name="mediaTypes">
+	        <map>
+	            <entry key="xml" value="application/xml"/>
+	            <entry key="json" value="application/json"/>
+	        </map>
+	    </property>
+	    <property name="defaultViews">
+	        <list>
+	            <bean class="org.springframework.web.servlet.view.xml.MarshallingView">
+	                <property name="marshaller">
+	                    <bean class="org.springframework.oxm.xstream.XStreamMarshaller"  p:autodetectAnnotations="true" />
+	                </property>
+	            </bean>
+	            <bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />        
+	        </list>
+	    </property>
+		<property name="ignoreAcceptHeader" value="true" />
+	</bean>
+	
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="order" value="2" />
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+ 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="20971520" /><!-- 20MB -->
+	</bean> 
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${database.driverClassName}"/>
+        <property name="url" value="${database.url}"/>
+        <property name="username" value="${database.username}"/>
+        <property name="password" value="${database.password}"/>
+    </bean>
+    
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+</beans>
+	
